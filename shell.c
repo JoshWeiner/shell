@@ -1,53 +1,37 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <time.h>
-#include "parse.h"
+#include "parse_and_run.h"
 
-static void sighandler(int signo) {
+static void sighandler(int signo){
+
   if(signo == SIGINT) {
-     // int fd = open("record.txt", O_WRONLY | O_CREAT, 0644);
-     // char error[] =  "Exit due to SIGINT \n";
-     // int wf = write(fd, error, sizeof(error));
-     // close(fd);
+     int fd = open("record.txt", O_WRONLY | O_CREAT, 0644);
+     char error[] =  "Exit due to SIGINT \n";
+     int wf = write(fd, error, sizeof(error));
+     close(fd);
      exit(0);
-   }
+  }
 }
 
 
-int main(int argc, char *argv[]) {
-  printf("We sell C-shells by the C-shore \n");
-  signal(SIGINT, sighandler);
 
-  while (1) {
+int main() {
+    printf("\e[33mWe sell C-shells by the C-shore: Welcome to Josh's shell!!!! \n");
+    signal(SIGINT, sighandler);
 
-    char cwd[100];
-    getwd(cwd);
-    printf("%s$", cwd);
-    fflush(stdout);
+    while (1) {
 
-    char * line = malloc(1000);
-    fgets(line, 1000, stdin);
+        //Prints out new input line with current working directory
+        char cwd[PATH_MAX]; //4096 bytes allocated to cwd
+        getcwd(cwd, sizeof(cwd));
+        printf("\e[34m%s\e[31m(C-Shell)\e[37m$ ", cwd);
+        fflush(stdout);
 
-    char * last;
-    while (last == strsep(&line, ";")) {
-      printf("%s", last);
-      char ** rgs = parse_args(line);
-      execvp(getwd(cwd), rgs);
-      printf("%s", rgs);
-      if (errno) {
-          printf("Error: %s \n", strerror(errno));
-      }
-      last ++;
+        char *line = malloc(1000);
+        char *start = line;
+        char *iter_cmd;
+        fgets(line, 1000, stdin);
+        line[strlen(line) - 1] = '\0';
+
+        iterate_commands_semicolon(line, start, iter_cmd);
     }
-
-
-  }
-  return 0;
+    return 0;
 }
