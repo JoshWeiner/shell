@@ -33,21 +33,21 @@ void child_process(char ** rgs) {
 // Then tests if there is a valid file descriptor (if there is a piping function, for example)
 // -----------            -------------- //
 void exec_args(int pipes[], int infileno, char * cmd, char ** rgs, int i, int file_descriptor) {
-  if (!fork()) {
-      if (cmd) {
-        dup2(pipes[1], STDOUT_FILENO);
-      }
-      close(pipes[0]);
-      if(!file_descriptor) {
-        dup2(infileno, STDIN_FILENO);
-      }
+  int child = fork();
+  //fork process
+  if (!child) {
+      // piping function
+      piping(cmd, pipes, fd, infileno);
       execvp(rgs[0], rgs);
       exit(1);
   }
+
   signal(SIGINT, sighandler);
-  if (strcmp(rgs[i - 1], "&")) {
+  //spawns a child process if there is an & symbol, so that operations can continue in the shell
+  if (strcmp("&", rgs[i - 1])) {
     child_process(rgs);
   }
+
   signal(SIGINT, sighandler);
   close(pipes[1]);
   infileno = pipes[0];
