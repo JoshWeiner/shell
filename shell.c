@@ -22,7 +22,7 @@ int main() {
         //Prints out new input line with current working directory
         char cwd[PATH_MAX]; //4096 bytes allocated to cwd
         getcwd(cwd, sizeof(cwd));
-        printf("\e[34m%s\e[31m(C-Shell)\e[37m$ ", cwd);
+        printf("\e[34m%s\e[31m(C-Shell)\e[37m$ \x1B[0m", cwd);
         fflush(stdout);
 
         char *line = malloc(1000);
