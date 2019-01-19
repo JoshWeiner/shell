@@ -32,7 +32,7 @@ void child_process(char ** rgs) {
 // First tests if there is a valid command
 // Then tests if there is a valid file descriptor (if there is a piping function, for example)
 // -----------            -------------- //
-void exec_args(int pipes[], int infileno, char * cmd, char ** rgs, int i, int file_descriptor) {
+void exec_args(int pipes[], int infileno, char * cmd, char ** rgs, int i, int fd) {
   int child = fork();
   //fork process
   if (!child) {
